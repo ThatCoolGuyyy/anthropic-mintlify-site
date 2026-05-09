@@ -1,0 +1,76 @@
+---
+title: "GET /v1/models"
+description: "List available Claude models"
+---
+
+# GET /v1/models
+
+Returns a list of available Claude models. Use this to confirm which model IDs are currently active before building integrations.
+
+**Base URL:** `https://api.anthropic.com`
+
+## Query parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `before_id` | string | No | Return models with IDs that come before this ID. Used for pagination. |
+| `after_id` | string | No | Return models with IDs that come after this ID. Used for pagination. |
+| `limit` | integer | No | Number of models to return. Default 20, max 1000. |
+
+## Example request
+
+```bash
+curl https://api.anthropic.com/v1/models \
+  -H "x-api-key: $ANTHROPIC_API_KEY" \
+  -H "anthropic-version: 2023-06-01"
+```
+
+## Example response
+
+```json
+{
+  "data": [
+    {
+      "type": "model",
+      "id": "claude-sonnet-4-6",
+      "display_name": "Claude Sonnet 4.6",
+      "created_at": "2025-08-01T00:00:00Z"
+    },
+    {
+      "type": "model",
+      "id": "claude-opus-4-6",
+      "display_name": "Claude Opus 4.6",
+      "created_at": "2025-08-01T00:00:00Z"
+    },
+    {
+      "type": "model",
+      "id": "claude-haiku-4-5-20251001",
+      "display_name": "Claude Haiku 4.5",
+      "created_at": "2025-10-01T00:00:00Z"
+    }
+  ],
+  "has_more": false,
+  "first_id": "claude-sonnet-4-6",
+  "last_id": "claude-haiku-4-5-20251001"
+}
+```
+
+## Response fields
+
+| Field | Type | Description |
+|---|---|---|
+| `data` | array | Array of model objects. |
+| `data[].id` | string | The model ID used when making API requests. |
+| `data[].display_name` | string | Human-readable model name. |
+| `data[].created_at` | string | ISO 8601 timestamp for when the model was made available. |
+| `has_more` | boolean | Whether there are more models beyond this page. |
+| `first_id` | string | The ID of the first model in this page. |
+| `last_id` | string | The ID of the last model in this page. |
+
+## Error codes
+
+| Code | Meaning |
+|---|---|
+| `401` | Unauthorized. The API key is missing or invalid. |
+| `429` | Rate limited. |
+| `500` | Server error. |

@@ -1,0 +1,97 @@
+---
+title: "POST /v1/messages"
+description: "Send a message to Claude and receive a response"
+---
+
+# POST /v1/messages
+
+Sends a message to a Claude model and returns the model's response.
+
+**Base URL:** `https://api.anthropic.com`
+
+**Required headers:**
+
+| Header | Value |
+|---|---|
+| `x-api-key` | Your Anthropic API key |
+| `anthropic-version` | `2023-06-01` |
+
+## Request body
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `model` | string | Yes | The model ID to use. Example: `claude-sonnet-4-6`. |
+| `messages` | array | Yes | Array of message objects. Each object requires a `role` (`user` or `assistant`) and `content` (string or array). |
+| `max_tokens` | integer | Yes | Maximum number of tokens to generate. Must be greater than 0. |
+| `system` | string | No | System prompt that sets context and instructions for the model. |
+| `temperature` | number | No | Randomness of the output. Range: 0 to 1. Lower values produce more deterministic responses. Defaults to 1. |
+| `top_p` | number | No | Nucleus sampling parameter. Range: 0 to 1. Use either `temperature` or `top_p`, not both. |
+| `stop_sequences` | array | No | Array of strings. The model stops generating when it produces one of these sequences. |
+| `stream` | boolean | No | If `true`, the response is streamed using server-sent events. Defaults to `false`. |
+
+## Example request
+
+```bash
+curl https://api.anthropic.com/v1/messages \
+  -X POST \
+  -H "x-api-key: $ANTHROPIC_API_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "claude-sonnet-4-6",
+    "max_tokens": 256,
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain what an API is in one sentence."
+      }
+    ]
+  }'
+```
+
+## Example response
+
+```json
+{
+  "id": "msg_01XFDUDYJgAACzvnptvVoYEL",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "An API (Application Programming Interface) is a set of rules and protocols that allows different software applications to communicate and share data with each other."
+    }
+  ],
+  "model": "claude-sonnet-4-6",
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "usage": {
+    "input_tokens": 20,
+    "output_tokens": 34
+  }
+}
+```
+
+## Response fields
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Unique message identifier. |
+| `type` | string | Always `message`. |
+| `role` | string | Always `assistant`. |
+| `content` | array | Array of content blocks. Each block has a `type` (`text` or `tool_use`) and the corresponding content. |
+| `model` | string | The model that handled the request. |
+| `stop_reason` | string | Why the model stopped. One of: `end_turn`, `max_tokens`, `stop_sequence`, `tool_use`. |
+| `stop_sequence` | string or null | The stop sequence that triggered the stop, if applicable. |
+| `usage.input_tokens` | integer | Number of tokens in the input. |
+| `usage.output_tokens` | integer | Number of tokens in the generated response. |
+
+## Error codes
+
+| Code | Meaning |
+|---|---|
+| `400` | Bad request. The request body is malformed or missing required fields. |
+| `401` | Unauthorized. The API key is missing or invalid. |
+| `403` | Forbidden. Your API key doesn't have permission for this request. |
+| `429` | Rate limited. You've exceeded your requests-per-minute or tokens-per-minute limit. |
+| `500` | Server error. An internal error occurred on Anthropic's side. |

@@ -1,0 +1,50 @@
+---
+title: "Anthropic SDK Docs"
+description: "Build applications with Claude using the official Python SDK"
+---
+
+# Anthropic SDK Docs
+
+The Anthropic Python SDK gives you a typed, Pythonic interface to Claude. You can send messages, stream responses, count tokens before sending, and list available models, all without writing raw HTTP requests.
+
+This site covers the essentials: getting your first API call working, and a reference for the three most commonly used endpoints.
+
+## What you'll find here
+
+<CardGroup cols={2}>
+  <Card title="Tutorial" icon="rocket" href="/tutorial">
+    Make your first API call with the Anthropic Python SDK. Takes about 10 minutes.
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference/messages">
+    Reference documentation for the Messages, Count Tokens, and Models endpoints.
+  </Card>
+</CardGroup>
+
+## Before you start
+
+You'll need:
+
+- Python 3.9 or later
+- An Anthropic API key from [console.anthropic.com](https://console.anthropic.com)
+- The SDK installed: `pip install anthropic`
+
+## Quick example
+
+```python
+import os
+from anthropic import Anthropic
+
+client = Anthropic()
+
+message = client.messages.create(
+    model="claude-sonnet-4-6",
+    max_tokens=256,
+    messages=[
+        {"role": "user", "content": "Explain what an API is in one sentence."}
+    ]
+)
+
+print(message.content[0].text)
+```
+
+See the [tutorial](/tutorial) for a full walkthrough with expected output and troubleshooting.

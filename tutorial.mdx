@@ -1,0 +1,160 @@
+---
+title: "Make your first API call"
+description: "Send your first message to Claude using the Anthropic Python SDK"
+---
+
+# Make your first API call with the Anthropic Python SDK
+
+The Anthropic Python SDK gives you a typed, Pythonic interface to Claude. Instead of writing raw HTTP requests, you install one package, point it at your API key, and start sending messages in a few lines of code. By the end of this tutorial, you'll have a working Python script that sends a message to Claude and prints the response.
+
+## Prerequisites
+
+- Python 3.9 or later
+- An Anthropic API key from [console.anthropic.com](https://console.anthropic.com)
+- pip or another Python package manager
+
+## Steps
+
+### Step 1: Install the SDK
+
+Open your terminal and run:
+
+```bash
+pip install anthropic
+```
+
+Confirm the installation worked:
+
+```bash
+python -c "import anthropic; print(anthropic.__version__)"
+```
+
+**Expected output:**
+
+```
+0.99.0
+```
+
+The version number may differ if a newer release is available, but you should see a version string with no errors.
+
+### Step 2: Store your API key
+
+Never hardcode your API key in your script. Store it as an environment variable instead.
+
+On macOS or Linux:
+
+```bash
+export ANTHROPIC_API_KEY="your-api-key-here"
+```
+
+On Windows (Command Prompt):
+
+```cmd
+set ANTHROPIC_API_KEY=your-api-key-here
+```
+
+To make this persist across terminal sessions, add the `export` line to your `~/.zshrc` or `~/.bashrc` file and run `source ~/.zshrc`.
+
+Confirm it loaded:
+
+```bash
+echo $ANTHROPIC_API_KEY
+```
+
+**Expected output:**
+
+```
+your-api-key-here
+```
+
+If you see an empty line, the variable isn't set. Re-run the export command.
+
+### Step 3: Write your first script
+
+Create a file called `first_call.py` and paste this in:
+
+```python
+import os
+from anthropic import Anthropic
+
+# Initialize the client. It reads ANTHROPIC_API_KEY from the environment automatically.
+client = Anthropic()
+
+# Send a message to Claude
+message = client.messages.create(
+    model="claude-sonnet-4-6",
+    max_tokens=256,
+    messages=[
+        {
+            "role": "user",
+            "content": "Explain what an API is in one sentence."
+        }
+    ]
+)
+
+# Print the text response
+print(message.content[0].text)
+```
+
+### Step 4: Run the script
+
+```bash
+python first_call.py
+```
+
+**Expected output:**
+
+```
+An API (Application Programming Interface) is a set of rules and protocols
+that allows different software applications to communicate and share data
+with each other.
+```
+
+The exact wording will vary since Claude generates responses dynamically. What matters is that you see a coherent one-sentence explanation with no errors.
+
+### Step 5: Inspect the full response object
+
+The `message` object contains more than just the text. Add this line to your script to see the full response:
+
+```python
+print(message)
+```
+
+**Expected output:**
+
+```
+Message(
+    id='msg_01XFDUDYJgAACzvnptvVoYEL',
+    content=[TextBlock(text='An API...', type='text')],
+    model='claude-sonnet-4-6',
+    role='assistant',
+    stop_reason='end_turn',
+    stop_sequence=None,
+    type='message',
+    usage=Usage(input_tokens=20, output_tokens=34)
+)
+```
+
+Key fields to know:
+
+- `content[0].text` — the response text
+- `stop_reason` — why Claude stopped generating. `end_turn` means it finished naturally.
+- `usage.input_tokens` and `usage.output_tokens` — how many tokens the request used, which determines cost.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="AuthenticationError: 401 Unauthorized">
+    Your API key is missing, wrong, or not loaded. Run `echo $ANTHROPIC_API_KEY` to check. If it's empty, re-run the export command. If it has a value but you're still getting 401, log into [console.anthropic.com](https://console.anthropic.com) and confirm the key is active and hasn't been rotated.
+  </Accordion>
+
+  <Accordion title="ModuleNotFoundError: No module named 'anthropic'">
+    The SDK isn't installed in the Python environment you're running. Check which Python you're using with `which python` and make sure you installed the SDK in the same environment. If you're using a virtual environment, activate it before running pip install.
+  </Accordion>
+
+  <Accordion title="RateLimitError: 429 Too Many Requests">
+    You've exceeded your usage limit. On a free tier account this can happen quickly. Wait a moment and try again. For production use, add retry logic or implement exponential backoff. The SDK includes automatic retries by default for transient errors, but persistent 429s require you to slow down your request rate.
+  </Accordion>
+</AccordionGroup>
+
+**Still stuck?** Check the [Anthropic status page](https://status.anthropic.com) for ongoing incidents, or open an issue on the [anthropic-sdk-python GitHub repository](https://github.com/anthropics/anthropic-sdk-python/issues).

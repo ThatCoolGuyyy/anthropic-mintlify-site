@@ -1,0 +1,39 @@
+{
+  "name": "Anthropic SDK Docs",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#D97706",
+    "light": "#FCD34D",
+    "dark": "#92400E"
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Docs",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": ["index", "tutorial"]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api-reference/messages",
+              "api-reference/count-tokens",
+              "api-reference/models"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

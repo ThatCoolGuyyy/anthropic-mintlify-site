@@ -1,0 +1,63 @@
+---
+title: "POST /v1/messages/count_tokens"
+description: "Count tokens before sending a request"
+---
+
+# POST /v1/messages/count_tokens
+
+Counts the number of tokens a message would use before sending it. Use this to check whether a request fits within a model's context window or to estimate costs before making the actual call.
+
+**Base URL:** `https://api.anthropic.com`
+
+## Request body
+
+Uses the same fields as `POST /v1/messages`. The `max_tokens` field is not required for this endpoint.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `model` | string | Yes | The model ID to count tokens for. |
+| `messages` | array | Yes | The messages to count tokens for. Same format as `/v1/messages`. |
+| `system` | string | No | System prompt to include in the count. |
+
+## Example request
+
+```bash
+curl https://api.anthropic.com/v1/messages/count_tokens \
+  -X POST \
+  -H "x-api-key: $ANTHROPIC_API_KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "claude-sonnet-4-6",
+    "system": "You are a helpful assistant.",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Explain what an API is in one sentence."
+      }
+    ]
+  }'
+```
+
+## Example response
+
+```json
+{
+  "input_tokens": 27
+}
+```
+
+## Response fields
+
+| Field | Type | Description |
+|---|---|---|
+| `input_tokens` | integer | Total number of tokens in the request, including the system prompt and all messages. |
+
+## Error codes
+
+| Code | Meaning |
+|---|---|
+| `400` | Bad request. The request body is malformed or missing required fields. |
+| `401` | Unauthorized. The API key is missing or invalid. |
+| `429` | Rate limited. |
+| `500` | Server error. |
